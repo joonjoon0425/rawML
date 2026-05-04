@@ -7,6 +7,4 @@ project(rawML LANGUAGES CXX CUDA)
 
 find_package(CUDAToolkit REQUIRED)
 
-add_executable(test_gemm tests/cuda/test_gemm.cu)
-
-target_link_libraries(test_gemm PRIVATE CUDA::cublas)
+add_subdirectory(tests)
