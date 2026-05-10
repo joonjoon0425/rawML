@@ -59,6 +59,10 @@
             To prevent this, we place ReLU at the front of the network and then apply residual connection.
             But, the ReLU ignores all negative values, so we first apply linear layer, and then apply ReLU for the
             first residual block, and apply ReLU first for other residual blocks.
+
+        \subsubsection{Matching the Dimensions}
+            The residual connection is possible only when the dimensions of the input and output matches.
+            If the dimensions are different, we can apply projection operation and make residual connection.
         
     \subsection{Exploding Gradients}
         The residual connection solves vanishing gradient problem, but cannot solve exploding gradient problem.
