@@ -1,0 +1,80 @@
+\documentclass{article}
+\input{~/studies/preamble}
+
+\title{Residual Connections}
+\author{Hyoung Joon, Kim}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+    We introduce \textbf{residual network}, which enables us to use deep networks, with \textbf{batch normalization}.
+    Batch normalization is explained in \href{run:../regularization/normalization.pdf}{the other document}.
+
+\section{Main Ideas}
+    The residual network was introduced to solve the vanishing gradient problem. Ordinary sequential network,
+    without residual connection, the autocorrelation function of the gradient shows that nearby gradients are
+    no so correlated as the layer gets deeper. This means that a subtle change in gradient value leads to tremendous
+    change in the output result. This is termed \textbf{shattered gradients} phenomenon.
+
+    \subsection{Residual Connection}
+        \textbf{Residual connection} is to simply make the network to learn the residual instead of the objective itself.
+        To accomplish this, we just add the input to the output value.
+
+        For example, let's assume that we have following network layer:
+        \begin{align}
+            \textbf{h}_1 &= \textbf{f}_1[\textbf{x}] \\
+            \textbf{h}_2 &= \textbf{f}_2[\textbf{h}_1] \\
+            \textbf{y} &= \textbf{f}_3[\textbf{h}_2]
+        \end{align}
+        This is the ordinary sequential network.
+        Now, we add the input to the output.
+        \begin{align}
+            \textbf{h}_1 &= \textbf{x} + \textbf{f}_1[\textbf{x}] \\
+            \textbf{h}_2 &= \textbf{h}_1 + \textbf{f}_2[\textbf{h}_1] \\
+            \textbf{y} &= \textbf{h}_2 + \textbf{f}_3[\textbf{h}_2]
+        \end{align}
+        
+        We can interpret the residual connection in two different ways:
+        \begin{enumerate}
+            \item Ensemble: If we expand the network, we can see that the whole network is some kind of ensemble of 
+                small networks:
+                \begin{align}
+                \textbf{y} = \textbf{x} &+ \textbf{f}_1[\textbf{x}] \\
+                &+\textbf{f}_2[\textbf{x} + \textbf{f}_1[\textbf{x}]] \\
+                &+\textbf{f}_3[\textbf{x} + \textbf{f}_1[\textbf{x}] + \textbf{f}_2[\textbf{x} + \textbf{f}_1[\textbf{x}]]]
+                \end{align}
+            \item Various Connection from input to output:
+                Since there are various connection from input to output,
+                the vanishing gradient problem is relaxed.
+                You can see that the gradient of \textbf{y} about $\textbf{h}_3$ is $\textbf{I} + \partial\textbf{f}_4$,
+                and the $\textbf{I}$ prevents the vanishing gradient problem. 
+        \end{enumerate}
+
+        \subsubsection{Order of Operations}
+            If we apply ReLU at the end of the network, the residual connection will always add the positive value to the input value.
+            To prevent this, we place ReLU at the front of the network and then apply residual connection.
+            But, the ReLU ignores all negative values, so we first apply linear layer, and then apply ReLU for the
+            first residual block, and apply ReLU first for other residual blocks.
+        
+    \subsection{Exploding Gradients}
+        The residual connection solves vanishing gradient problem, but cannot solve exploding gradient problem.
+        Even the He initialization cannot resolve the exploding gradient problem in residual network.
+        We use batch normalization to deal with this problem.
+
+        The benefits of batch normalization with residual network is presented.
+        \begin{enumerate}
+            \item \textbf{Stable Forward Propagation}: Residual network without batch normalization has variance of the hidden units
+                increasing exponentialy. With batch normalization, the variance increases linearly, and even this can be resolved
+                by tuning the mean and standard deviation used in batch normalization.
+            \item \textbf{Higher Learning Rates}: Empirical studies and theory both show that batch normalization
+                smoothens the loss surface. This means we can use higher learning rates.
+            \item \textbf{Regularization}: Since the batch normalization uses batch dataset, this injects noise to the network
+                (since the statistics are different for each batches),
+                which has the effect of regularization.
+        \end{enumerate}
+
+\end{document}
