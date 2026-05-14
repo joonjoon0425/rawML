@@ -12,9 +12,9 @@
 
 \section{Introduction}
     The \textbf{transformer} architecture was originally introduced for NLP (Natural Language Processing)
-    , and surpasses the RNN (Residual Neural Network), which was the mainstream of NLP. Transformers can
+    , and surpasses the RNN (Recurrent Neural Network), which was the mainstream of NLP. Transformers can
     process various types of data, even if it was developed for NLP. For example, ViT (vision transformers)
-    often outperfrom CNN in image processing tasks.
+    often outperform CNN in image processing tasks.
 
     Transformers has following merits:
     \begin{itemize}
@@ -46,22 +46,22 @@
                 Let $\textbf{X}$ be $N \times D$ matrix, which consists of $N$ $D \times 1$ data vectors.
                 Then, the \textbf{dot-product self-attention} \textbf{Sa}, which is an $N \times D_v$ matrix, is defined as following:
                 \[
-                \textbf{Sa}[\textbf{X}]=\textbf{Softmax}\left( \textbf{Q}^{\top}\textbf{K}\right)\textbf{V}
+                \textbf{Sa}[\textbf{X}]=\textbf{Softmax}\left( \textbf{Q}\textbf{K}^{\top}\right)\textbf{V}
                 \]
                 where \textbf{V}, \textbf{Q}, \textbf{K}, called value, query and key, is defined as following:
                 \begin{align*}
-                    \textbf{V} &= \textbf{1}^{\top}\bm{\beta}_v + \textbf{X}\textbf{W}_v \\
-                    \textbf{Q} &= \textbf{1}^{\top}\bm{\beta}_q + \textbf{X}\textbf{W}_q \\
-                    \textbf{K} &= \textbf{1}^{\top}\bm{\beta}_k + \textbf{X}\textbf{W}_k
+                    \textbf{V} &= \textbf{1}\bm{\beta}_v^{\top} + \textbf{X}\textbf{W}_v^{\top} \\
+                    \textbf{Q} &= \textbf{1}\bm{\beta}_q^{\top} + \textbf{X}\textbf{W}_q^{\top} \\
+                    \textbf{K} &= \textbf{1}\bm{\beta}_k^{\top} + \textbf{X}\textbf{W}_k^{\top}
                 \end{align*}
                 
                 \begin{itemize}
-                    \item $\textbf{W}^{(v)}$, $\bm{\beta}_v$ have dimensionality $D \times D_v$ and $D_v \times 1$, respectively.
-                    \item $\textbf{W}^{(q)}$, $\bm{\beta}_q$ have dimensionality $D \times D_q$ and $D_q \times 1$, respectively.
-                    \item $\textbf{W}^{(k)}$, $\bm{\beta}_k$ have dimensionality $D \times D_k$ and $D_k \times 1$, respectively.
+                    \item $\textbf{W}_v$, $\bm{\beta}_v$ have dimensionality $D_v \times D$ and $D_v \times 1$, respectively.
+                    \item $\textbf{W}_q$, $\bm{\beta}_q$ have dimensionality $D_q \times D$ and $D_q \times 1$, respectively.
+                    \item $\textbf{W}_k$, $\bm{\beta}_k$ have dimensionality $D_k \times D$ and $D_k \times 1$, respectively.
                 \end{itemize}
                 
-                \textbf{1} is an $N \times 1$ row-vector. 
+                \textbf{1} is an $N \times 1$ vector. 
                 $D_v$ governs the size of the output vectors.
                 The \textbf{Softmax} function applies ordinary softmax function to each row, respectively.
             \end{defn}
@@ -116,16 +116,24 @@
                 {\sum_{i=1}^{N} \exp{\textbf{q}_n^\top \textbf{k}_i}} \textbf{v}_m
             \]
 
-            To summarize, the following are the meaning of each matrices:
-            \begin{itemize}
-                \item $\textbf{q}_n$: The question that $\textbf{v}_n$ asks to other key.
-                \item $\textbf{k}_n$: The information that $\textbf{v}_n$ is holding.
-                \item the attention weight $a_{nm} = \dfrac{\exp \textbf{q}_n^\top \textbf{k}_m}{\sum_{i=1}^{N} \exp{\textbf{q}_n^\top \textbf{k}_i}}$
-                : the amount of attention that $\textbf{v}_n$ is paying to $\textbf{v}_m$.
-                \item $\textbf{y}_n = \sum_{m=1}^{N} \dfrac{\exp \textbf{q}_n^\top \textbf{k}_m}
-                {\sum_{i=1}^{N} \exp{\textbf{q}_n^\top \textbf{k}_i}} \textbf{v}_m$: Newly created context which is easier to interpret.
-                The amount of attention that $\textbf{v}_n$ is paying to other data is compressed in.
-            \end{itemize}
+            \begin{rem}{Summary of the meaning of each matrices}{attenSumm}
+                To summarize, the following are the meaning of each matrices:
+                \begin{itemize}
+                    \item $\textbf{q}_n$: The question that $\textbf{v}_n$ asks to other key.
+                    \item $\textbf{k}_n$: The information that $\textbf{v}_n$ is holding.
+                    \item the attention weight $a_{nm} = \dfrac{\exp \textbf{q}_n^\top \textbf{k}_m}{\sum_{i=1}^{N} \exp{\textbf{q}_n^\top \textbf{k}_i}}$
+                    : the amount of attention that $\textbf{v}_n$ is paying to $\textbf{v}_m$.
+                    \item $\textbf{y}_n = \sum_{m=1}^{N} \dfrac{\exp \textbf{q}_n^\top \textbf{k}_m}
+                    {\sum_{i=1}^{N} \exp{\textbf{q}_n^\top \textbf{k}_i}} \textbf{v}_m$: Newly created context which is easier to interpret.
+                    The amount of attention that $\textbf{v}_n$ is paying to other data is compressed in.
+                \end{itemize}
+            \end{rem}
+
+            \begin{rem}{}{attenMat}
+            Added to ease understanding the matrix notation of attention mechanism :
+            \[
+            \]
+            \end{rem}
 
     \subsection{Extensions to Attention}
         The following extensions are used very often when using attention mechanism.
@@ -135,7 +143,7 @@
             dividing with square root of the dimension of query vector (which must be same as key vector's dimension);
             \begin{defn}{Scaled Dot-product Self-attention}{scaledDPSA}
             \[
-                \textbf{Sa}[\textbf{X}]=\textbf{Softmax}\left(\frac{\textbf{Q}^{\top}\textbf{K}}{\sqrt{D_k}}\right)\textbf{V}
+                \textbf{Sa}[\textbf{X}]=\textbf{Softmax}\left(\frac{\textbf{Q}\textbf{K}^{\top}}{\sqrt{D_k}}\right)\textbf{V}
             \]
             \end{defn}
             This is called \textbf{scaled dot-product self-attention}.
@@ -152,13 +160,13 @@
                 Let $\bm{\beta}_v^h$, $\bm{\beta}_q^h$, and $\bm{\beta}_k^h$ be the biases of $h$-th head.
                 We calculate $h$-th value, query, and key as:
                 \begin{align*}
-                    \textbf{V}_h &= \textbf{1}^{\top}\bm{\beta}_v^h + \textbf{X}\textbf{W}_v^h \\
-                    \textbf{Q}_h &= \textbf{1}^{\top}\bm{\beta}_q^h + \textbf{X}\textbf{W}_q^h \\
-                    \textbf{K}_h &= \textbf{1}^{\top}\bm{\beta}_k^h + \textbf{X}\textbf{W}_k^h
+                    \textbf{V}_h &= \textbf{1}(\bm{\beta}_v^h)^{\top} + \textbf{X}(\textbf{W}_v^h)^{\top}\\
+                    \textbf{Q}_h &= \textbf{1}(\bm{\beta}_q^h)^{\top} + \textbf{X}(\textbf{W}_q^h)^{\top}\\
+                    \textbf{K}_h &= \textbf{1}(\bm{\beta}_k^h)^{\top} + \textbf{X}(\textbf{W}_k^h)^{\top}
                 \end{align*}
                 Then, each head can be written as:
                 \[
-                    \textbf{Sa}_h[\textbf{X}]=\textbf{Softmax}\left(\frac{\textbf{Q}_h^{\top}\textbf{K}_h}{\sqrt{D_k^h}}\right)\textbf{V}_h
+                    \textbf{Sa}_h[\textbf{X}]=\textbf{Softmax}\left(\frac{\textbf{Q}_h\textbf{K}_h^{\top}}{\sqrt{D_k^h}}\right)\textbf{V}_h
                 \]
                 The multi-head attention is defined as follows;
                 \[
@@ -172,6 +180,9 @@
             As the structure of the attention mechanism shows, the attention mechanism itself is equivariant to
             permutation of input values. However, the sequential information is important in NLP. To overcome this,
             we can inject a positional information into the input itselt, without modifying the attention mechanism.
+
+            \begin{defn}{Sinusoidal Positional Encoding}{sinPosEnc}
+            \end{defn}
 
 
 \end{document}

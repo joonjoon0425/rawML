@@ -175,12 +175,13 @@
                     We distribute the value to the position where it originated from.
                 \item \textbf{Bilinear Interpolation}. Fill the missing values between points with known values using bilinear interpolation.
                 \item \textbf{Transposed Convolution}. Using stride 2 kernel decrease the size to half. Transposed convolution does this in kind of opposite way, doubling the size.
-                    The reason that this is called transposed convolution is that it is same as transposing the matrix representation of convolution operation and applying it to the data.
-                    Different kernel can be used in convolution and transposed convolution.
+                    The reason that this is called transposed convolution is because matrix representation of the operation
+                    is same as the transpose of that of ordinary convolution operation.
+                    The kernel used in transposed convolution need not be the same as the one used in the preceding convolution.
             \end{enumerate}
 
             \begin{rem}{Transposed Convolution}{TransConv}
-                Transposed convolution can be implemented via dilation. The point is that the dilation is applied to the input data, not the kernel.
+                Transposed convolution can be implemented via ordinary convolution with dilation. The point is that the dilation is applied to the input data, not the kernel.
                 Let's assume that we used stride $s$ kernel in convolution operation. Then, to retrieve the data to the original size using transposed convolution,
                 we take the following step:
                 \begin{enumerate}
