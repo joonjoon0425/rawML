@@ -18,11 +18,106 @@
 
     We'll need some knowledge about \href{run:../../_theory/PGM/PGM.pdf}{probabilistic graphical models}, since these algorithms are
     based on them.
+
+    \emph{Algorithms are feeling quite abstract right now... Since it is expressed as equations. Guess I have to
+    look for concrete examples.}
 \section{Sum-product Algorithm}
-    Sum-product algorithm can be applied to undirected tree, directed tree and polytree.
-    The definition of \textbf{tree} and \textbf{polytree} is as following:
-    \begin{itemize}
-        \item Undirected tree
-    \end{itemize}
+    \subsection{Introduction}
+        Sum-product algorithm can be applied to undirected tree, directed tree and polytree.
+        The definition of \textbf{tree} and \textbf{polytree} is as following:
+        \begin{itemize}
+            \item \textbf{Undirected tree}: Only one path exists between nodes.
+            \item \textbf{Directed tree}: Nodes have only one parent, and root node has no parent.
+            \item \textbf{Directed polytree}: Nodes can have more than one parent, but still only one path
+            (ignoring directions of the arrows) exists between nodes.
+        \end{itemize}
+    \subsection{Factor Graphs}
+        We first discuss about another graphical model, called \textbf{factor graph}.
+        \begin{defn}{Factor Graph}{facGraph}
+            A \textbf{factor graph} is a \emph{bipartite graph} with factor node $\{f_s\}$ and variable node $\{\textbf{x}_k\}$ 
+            that represents following probability distribution:
+            \[
+            p(\textbf{x})=\prod_{s} f_s(\textbf{x}_s)
+            \]
+            where $\textbf{x}_s$ is a subset of variable nodes associated with a factor node $f_s$.
+        \end{defn}
+        The factor graph will be helpful in understanding the sum-product algorithm.
+        
+        We can reconstruct undirected tree and directed tree and polytree into factor graph, which will be a tree again.
+        We can just add conditional probabilities in the factored distribution as factor nodes,
+        and ordinary nodes as variable nodes.
+
+        % TODO: add factor graph example
+
+    \subsection{Sum-product Algorithm}
+        We can calculate marginal distributions by summing up useless variables. However, this is very costly if we
+        sum up in naive way. We must exploit the conditional independency inherent in the graphical models.
+        The \textbf{sum-product} algorithm allows us to do so.
+
+        We assume that we apply this algorithm to tree or polytree with discrete random variables.
+        Continuous variable can use the same algorithm, changing all $\Sigma$ to $\int$.
+        \begin{defn}{Message Passing}{messFacVar}
+            Let $x$ be a variable node and let $f_s$ be a factor node of a factor graph.
+            Then, the message $\mu_{f_s \to x}(x)$ from factor $f_s$ to node $x$ is defined by
+            \[
+            \mu_{f_s \to x}(x)=\left(\sum_{X_s} f_s(x, X_s)\right) \left(\prod_{m \in \text{ne}(f_s) \backslash x}\mu_{x_m \to f_s}(x_m)\right)
+            \]
+            where $X_s=\text{ne}(f_s)$ is a set of variable nodes which are the neighbor of $f_s$.
+            When $f_s$ is the leaf node, then $\mu_{f_s \to x}(x) = f_s(x)$.
+            
+            The message $\mu_{x \to f_s}(x)$ from node $x$ to $f_s$ is defined by
+            \[
+            \mu_{x \to f_s}(x)=\prod_{l \in \text{ne}(x) \backslash f_s} \mu_{f_l \to x}(x).
+            \]
+            When $x$ is the leaf node, then $\mu_{x \to f_s}(x) = 1$.
+        \end{defn}
+
+        \begin{thm}{Sum-product Algorithm}{sumProdAlg}
+            Let $p(\textbf{x})$ be a probability distribution of a factor graph.
+            Then, the marginal probability of variable $x$ is
+            \[
+            p(x) = \frac{1}{Z}\prod_{f \in \text{ne}(x)}\mu_{f \to x}(x).
+            \]
+            where $Z$ is a normalization constant.
+            Additionally, the marginal probability of variable $\textbf{x}_s$ which is
+            associated with factor $f_s$ is
+            \[
+            p(\textbf{x}_s) = \frac{1}{Z}f_s(\textbf{x}_s) \prod_{i \in \text{ne}(f_s)}\mu_{x_i \to f_s}(x_i)
+            \]
+            where $Z$, is again a normalization constant.
+        \end{thm}
+        \begin{proof}
+            See Bishop, 2006. The point is to exchange the product and sum. Look at equation $a(b+c) = ab+ac$.
+            We only need two execution to calculate $a(b+c)$, while three execution is required for calculating $ab + ac$.
+            The algorithm exploits this efficiency.
+        \end{proof}
+        
+        We can efficiently calculate the marginal probability of any variable $x$
+        by;
+        \begin{enumerate}
+            \item Pass message from leaves to root;
+            \item Pass message from root to leaves.
+        \end{enumerate}
+        We save the intermediate message passed to each node. This will use extra memory, but
+        eliminate useless calculation, in a sense of dynamic programming.
+        
+        Calculating the marginal distribution of more than one variable is most natural when the variables
+        are associated with same factor. If not, one has to marginalize out other variables.
+
+        We can also get the conditional distribution when some variables are observed:
+        \begin{enumerate}
+            \item Suppose a set of variable ${v_1, v_2, \dots, v_n}$ is observed as ${\hat{v}_1, \hat{v}_2, \dots, \hat{v}_n}$ 
+            \item Multiply the joint distribution $p(\textbf{x})$ by $\prod_{i} \delta(v_i, \hat{v}_i)$.
+            \item Apply sum-product algorithm to the multiplied joint distribution.
+        \end{enumerate}
+        Multiplying by $\prod_{i} \delta(v_i, \hat{v}_i)$, the joint distribution equals
+        $p(\textbf{x} \backslash \textbf{v}, \textbf{v} = \hat{\textbf{v}})$.
+        Then, by applying sum-product algorithm, we can calculate $p(x_i|\textbf{v}=\hat{\textbf{v}})$ with $x_i \notin \{v_1, v_2, ..., v_n\}$ up to a normalization constant,
+        which can be calculated efficiently using local computation.
+
+    \section{Max-sum Algorithm}
+    \section{Junction Tree Algorithm}
+    \section{Loopy Belief Propagation Algorithm}
+        Actually, this algorithm is not exact.
 
 \end{document}
