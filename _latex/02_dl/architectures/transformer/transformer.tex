@@ -155,9 +155,12 @@
             To prevent this, we use multiple value, query, and key weights.
             We produce attention result in parallel with each weights and then concatenate them.
             This is called \textbf{multi-head attention}.
-            \begin{defn}{Multi-head Attention}
-                Let $\textbf{W}_v^h$, $\textbf{W}_q^h$, and $\textbf{W}_k^h$ be the weights of $h$-th attention mechanism or \textbf{head}.
-                Let $\bm{\beta}_v^h$, $\bm{\beta}_q^h$, and $\bm{\beta}_k^h$ be the biases of $h$-th head.
+            \begin{defn}{Multi-head Attention}{multiHeadAtten}
+                Let $X$ be an $N \times D$ matrix.
+                Let $\textbf{W}_v^h \in \mathbb{R}^{D_v \times D}$, $\textbf{W}_q^h \in \mathbb{R}^{D_k \times D}$,
+                and $\textbf{W}_k^h \in \mathbb{R}^{D_k \times D}$ be the weights of $h$-th attention mechanism or \textbf{head}.
+                Let $\bm{\beta}_v^h \in \mathbb{R}^{D_v}$, $\bm{\beta}_q^h \in \mathbb{R}^{D_k}$,
+                and $\bm{\beta}_k^h \in \mathbb{R}^{D_k}$ be the biases of $h$-th head.
                 We calculate $h$-th value, query, and key as:
                 \begin{align*}
                     \textbf{V}_h &= \textbf{1}(\bm{\beta}_v^h)^{\top} + \textbf{X}(\textbf{W}_v^h)^{\top}\\

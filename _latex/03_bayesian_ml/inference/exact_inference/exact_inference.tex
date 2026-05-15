@@ -18,9 +18,7 @@
 
     We'll need some knowledge about \href{run:../../_theory/PGM/PGM.pdf}{probabilistic graphical models}, since these algorithms are
     based on them.
-
-    \emph{Algorithms are feeling quite abstract right now... Since it is expressed as equations. Guess I have to
-    look for concrete examples.}
+    
 \section{Sum-product Algorithm}
     \subsection{Introduction}
         Sum-product algorithm can be applied to undirected tree, directed tree and polytree.
@@ -60,7 +58,7 @@
             Let $x$ be a variable node and let $f_s$ be a factor node of a factor graph.
             Then, the message $\mu_{f_s \to x}(x)$ from factor $f_s$ to node $x$ is defined by
             \[
-            \mu_{f_s \to x}(x)=\left(\sum_{X_s} f_s(x, X_s)\right) \left(\prod_{m \in \text{ne}(f_s) \backslash x}\mu_{x_m \to f_s}(x_m)\right)
+            \mu_{f_s \to x}(x)=\left(\sum_{X_s} f_s(x, X_s)\right) \left(\prod_{x_m \in \text{ne}(f_s) \backslash x}\mu_{x_m \to f_s}(x_m)\right)
             \]
             where $X_s=\text{ne}(f_s)$ is a set of variable nodes which are the neighbor of $f_s$.
             When $f_s$ is the leaf node, then $\mu_{f_s \to x}(x) = f_s(x)$.
@@ -101,9 +99,6 @@
         We save the intermediate message passed to each node. This will use extra memory, but
         eliminate useless calculation, in a sense of dynamic programming.
         
-        Calculating the marginal distribution of more than one variable is most natural when the variables
-        are associated with same factor. If not, one has to marginalize out other variables.
-
         We can also get the conditional distribution when some variables are observed:
         \begin{enumerate}
             \item Suppose a set of variable ${v_1, v_2, \dots, v_n}$ is observed as ${\hat{v}_1, \hat{v}_2, \dots, \hat{v}_n}$ 
@@ -114,10 +109,70 @@
         $p(\textbf{x} \backslash \textbf{v}, \textbf{v} = \hat{\textbf{v}})$.
         Then, by applying sum-product algorithm, we can calculate $p(x_i|\textbf{v}=\hat{\textbf{v}})$ with $x_i \notin \{v_1, v_2, ..., v_n\}$ up to a normalization constant,
         which can be calculated efficiently using local computation.
+        
+        Calculating the marginal distribution of more than one variable is most natural when the variables
+        are associated with same factor. If not, one has to marginalize out other variables.
+        \begin{enumerate}
+            \item Use the Bayes theorem: $p(x, y)=p(x|y)p(y)$;
+            \item Add dummy factor node $f_s$ connecting $x$ and $y$, where $f_s(x,y)=1$.
+        \end{enumerate}
 
-    \section{Max-sum Algorithm}
-    \section{Junction Tree Algorithm}
-    \section{Loopy Belief Propagation Algorithm}
-        Actually, this algorithm is not exact.
+        The sum-product algorithm cannot be applied to a graph with loops, since the message passing will
+        going to be repeated forever in the loop. However, we still can use this algorithm with loops, but it won't
+        produce an exact result, but produce an approximate result.
+        See section \ref{sec:loopyBeliefPropAlg} for more information.
+
+\section{Max-sum Algorithm}
+    \subsection{Introduction}
+        The \textbf{max-sum algorithm} is used to find out the MAP estimate of a given
+        graphical model. It uses message passing, the one used for sum-product algorithm.
+        Since multiplying small values can occur underflow, we use logarithm, which turns product into sums,
+    \subsection{Max-sum Algorithm}
+        \begin{defn}{Message Passing}{messPassMaxsum}
+            Let $x$ be a variable node and let $f_s$ be a factor node of a factor graph.
+            Then, the message $\mu_{f_s \to x}(x)$ from factor $f_s$ to node $x$ is defined by
+            \[
+                    \mu_{f_s \to x}(x)=\max_{X_s \backslash x}\left[\log f_s(x, X_s) + \sum_{x_m \in \text{ne}(f_s) \backslash x}\mu_{x_m \to f_s}(x_m)\right]
+            \]
+            where $X_s=\text{ne}(f_s)$ is a set of variable nodes which are the neighbor of $f_s$.
+            When $f_s$ is the leaf node, then $\mu_{f_s \to x}(x) = \log f_s(x)$.
+            
+            The message $\mu_{x \to f_s}(x)$ from node $x$ to $f_s$ is defined by
+            \[
+            \mu_{x \to f_s}(x)=\sum_{l \in \text{ne}(x) \backslash f_s} \mu_{f_l \to x}(x).
+            \]
+            When $x$ is the leaf node, then $\mu_{x \to f_s}(x) = 0$.
+        \end{defn}
+        Note that we applied logarithm to probabilities. 
+
+        \begin{thm}{Max-sum Algorithm}{maxSumAlg}
+            Let $p^{\max}$ be the highest value of probability distribution $p(\textbf{x})$. Then,
+            \[
+            p^{\max}=\max_{x}\left[\sum_{s \in \text{ne}(x)}\mu_{f_s \to x}(x)\right],
+            \]
+            and the individual value of each variables is
+            \[
+            x^{\max}=\arg \max_{x}\left[\sum_{s \in \text{ne}(x)}\mu_{f_s \to x}(x)\right]
+            \]
+            We are ignoring the normalizing constant.
+        \end{thm}
+
+        We save each values that maximizes the whole probability distribution, to reduce the
+        useless repeated operations when obtaining $\textbf{x}^{\max}$.
+
+        \begin{rem}{Message Passing is a Framework}{messPassFramework}
+            As one can see, by changing the content of the message and the operations, we can yield different algorithms.
+            Sum-product algorithm and max-sum algorithms are the examples. Dijkstra algorithm and max flow
+            algorithm can be interpreted as message passing framework. One would think of the factor graph's absence, but factor graph is only a tool for
+            explaining the message passing framework. For more information, one may search for algebraic path problem and semiring.
+        \end{rem}
+
+\section{Junction Tree Algorithm}
+    \subsection{Introduction}
+        The \textbf{junction-tree algorithm} is an algorithm that calculates marginal distributions like sum-product algorithm.
+        The difference is that it can be applied to any type of graphs, in the expense of computational memories.
+\section{Loopy Belief Propagation Algorithm}\label{sec:loopyBeliefPropAlg}
+    \subsection{Introduction}
+        \emph{To be continued....}
 
 \end{document}
