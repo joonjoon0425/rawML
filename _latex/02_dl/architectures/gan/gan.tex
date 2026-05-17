@@ -84,7 +84,7 @@ distribution.
 \section{Extensions of GAN}\label{sec:exGAN}
     \subsection{WGAN}
         \subsubsection{Introduction}
-            The original GAN architecture are difficult to train. The training is unstable itself,
+            The original GAN architecture is difficult to train. The training itself is unstable,
             and even though it is trained well, it may suffer from \textbf{mode dropping} and \textbf{mode collapse}.
             If the generator succesfully deceives discriminator but creates only a subset of whole data, this is called mode dropping.
             If this phenomenon gets extreme, the generator creates only one sample, ignoring the latent variable.
@@ -160,7 +160,7 @@ distribution.
             The expectation terms are approximated with sums about samples, and the condition $\|\nabla_{\textbf{x}}f(\textbf{x}, \bm{\phi})\| \leq 1$
             is called \textbf{Lipschitz condition}.
 
-            One way the achieve this is to:
+            To achieve this, we use one of the following methods:
             \begin{enumerate}
                 \item Clip the gradient; This is the what the original WGAN uses.
                 \item Add a regularization term, penalizing when the gradient norm is bigger than one; This is called WGAN-GP,
